@@ -12574,11 +12574,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jaearle\\Documents\\Code\\PetersenExhibitionClassifier\\Azure Function Twitter.csproj",
+      "projectUniqueName": "c:\\Users\\jaearle\\Documents\\Code\\PetersenExhibitionClassifier\\Azure Function Twitter.csproj",
       "projectName": "Azure Function Twitter",
-      "projectPath": "C:\\Users\\jaearle\\Documents\\Code\\PetersenExhibitionClassifier\\Azure Function Twitter.csproj",
+      "projectPath": "c:\\Users\\jaearle\\Documents\\Code\\PetersenExhibitionClassifier\\Azure Function Twitter.csproj",
       "packagesPath": "C:\\Users\\jaearle\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jaearle\\Documents\\Code\\PetersenExhibitionClassifier\\obj\\",
+      "outputPath": "c:\\Users\\jaearle\\Documents\\Code\\PetersenExhibitionClassifier\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

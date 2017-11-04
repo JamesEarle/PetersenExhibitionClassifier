@@ -11,30 +11,48 @@ namespace PetersenExhibitionClassifier
         static void Main(string[] args)
         {
             // Consumer Key 
-            string key = "9LXo5THOds4nCgMbknVTLlWED";
+            string key = "V8RTupGOUX6lnpChvBw2TKN2g";
 
             // Consumer Secret
-            string secret = "VohT2bxlsmmYgexIdbhPuMzhPMpa5eLZEWuqRLUwTRIxfPEra7";
+            string secret = "j64qb5cIMwE32jNNUsYssc2erdCOuAn70FzDysUHKxC7Qoh4of";
 
-            var session = Authorize(key, secret);
+            OAuth2Token token = GetOAuth2Token(key, secret).Result;
 
-            var tokens = GetTokens(key, secret, session);
+            SearchResult results = Search(token, "#PetersenMuseum");
 
-            var search = tokens.Search;
-
-            Console.WriteLine(tokens.Search);
-
-            // tokens.Statuses.Update(status => "hello");
-            Console.WriteLine(tokens);
+            foreach (var tweet in results)
+            {
+                // Temporary, account retweeted the same thing over and over making weird data.
+                if (tweet.User.ScreenName != "hugoscaglia")
+                {
+                    Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
+                    Console.WriteLine("{0} Favorites, {1} Retweets", tweet.FavoriteCount, tweet.RetweetCount);
+                    Console.WriteLine("\n");
+                }
+            }
         }
 
-        static async Task<OAuth.OAuthSession> Authorize(string key, string secret) {
-            ConnectionOptions options = new ConnectionOptions();
-            var session = await OAuth.AuthorizeAsync(key, secret);  
-            return session;     
+        static async Task<OAuth2Token> GetOAuth2Token(string key, string secret)
+        {
+            var token = await OAuth2.GetTokenAsync(key, secret);
+            return token;
         }
 
-        static Tokens GetTokens(string key, string secret, Task<OAuth.OAuthSession> session) {
+        static SearchResult Search(OAuth2Token tokens, string query)
+        {
+            var tweets = tokens.Search.TweetsAsync(q => query).Result;
+            return tweets;
+        }
+
+        // App only authentication
+        static async Task<OAuth.OAuthSession> Authorize(string key, string secret)
+        {
+            var session = await OAuth.AuthorizeAsync(key, secret);
+            return session;
+        }
+
+        static Tokens GetTokens(string key, string secret, Task<OAuth.OAuthSession> session)
+        {
             Tokens tokens = Tokens.Create(key, secret, session.Result.RequestToken, session.Result.RequestTokenSecret);
             return tokens;
         }
