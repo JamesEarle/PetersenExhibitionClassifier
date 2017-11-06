@@ -7,7 +7,6 @@ namespace PetersenExhibitionClassifier
 {
     class Program
     {
-        // Tokens tokens;
         static void Main(string[] args)
         {
             // Consumer Key 
@@ -18,16 +17,16 @@ namespace PetersenExhibitionClassifier
 
             OAuth2Token token = GetOAuth2Token(key, secret).Result;
 
-            SearchResult results = Search(token, "#PetersenMuseum");
+            SearchResult results = Search(token, "#PetersenMusem");
 
             foreach (var tweet in results)
             {
                 // Temporary, account retweeted the same thing over and over making weird data.
                 if (tweet.User.ScreenName != "hugoscaglia")
                 {
-                    Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
-                    Console.WriteLine("{0} Favorites, {1} Retweets", tweet.FavoriteCount, tweet.RetweetCount);
-                    Console.WriteLine("\n");
+                    Console.WriteLine($"{tweet.User.ScreenName}: {tweet.Text}");
+                    Console.WriteLine($"{tweet.FavoriteCount} Favorites, {tweet.RetweetCount} Retweets");
+                    Console.WriteLine("");
                 }
             }
         }
@@ -42,19 +41,6 @@ namespace PetersenExhibitionClassifier
         {
             var tweets = tokens.Search.TweetsAsync(q => query).Result;
             return tweets;
-        }
-
-        // App only authentication
-        static async Task<OAuth.OAuthSession> Authorize(string key, string secret)
-        {
-            var session = await OAuth.AuthorizeAsync(key, secret);
-            return session;
-        }
-
-        static Tokens GetTokens(string key, string secret, Task<OAuth.OAuthSession> session)
-        {
-            Tokens tokens = Tokens.Create(key, secret, session.Result.RequestToken, session.Result.RequestTokenSecret);
-            return tokens;
         }
     }
 }

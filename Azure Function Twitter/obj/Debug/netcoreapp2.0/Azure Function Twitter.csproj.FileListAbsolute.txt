@@ -18,3 +18,13 @@ C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\obj\Debug\netcoreap
 C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\obj\Debug\netcoreapp2.0\Azure Function Twitter.AssemblyInfo.cs
 C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\obj\Debug\netcoreapp2.0\Azure Function Twitter.dll
 C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\obj\Debug\netcoreapp2.0\Azure Function Twitter.pdb
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\bin\Debug\netcoreapp2.0\Azure Function Twitter.deps.json
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\bin\Debug\netcoreapp2.0\Azure Function Twitter.runtimeconfig.json
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\bin\Debug\netcoreapp2.0\Azure Function Twitter.runtimeconfig.dev.json
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\bin\Debug\netcoreapp2.0\Azure Function Twitter.dll
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\bin\Debug\netcoreapp2.0\Azure Function Twitter.pdb
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\obj\Debug\netcoreapp2.0\Azure Function Twitter.csproj.CoreCompileInputs.cache
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\obj\Debug\netcoreapp2.0\Azure Function Twitter.AssemblyInfoInputs.cache
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\obj\Debug\netcoreapp2.0\Azure Function Twitter.AssemblyInfo.cs
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\obj\Debug\netcoreapp2.0\Azure Function Twitter.dll
+c:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\Azure Function Twitter\obj\Debug\netcoreapp2.0\Azure Function Twitter.pdb

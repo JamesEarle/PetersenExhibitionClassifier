@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/Azure Function Twitter/Azure Function Twitter.csproj"
+                "${workspaceRoot}/Azure Function Twitter.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
