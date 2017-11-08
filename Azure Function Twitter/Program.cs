@@ -17,7 +17,7 @@ namespace PetersenExhibitionClassifier
 
             OAuth2Token token = GetOAuth2Token(key, secret).Result;
 
-            SearchResult results = Search(token, "#PetersenMusem");
+            SearchResult results = Search(token, "@realDonaldTrump");
 
             foreach (var tweet in results)
             {

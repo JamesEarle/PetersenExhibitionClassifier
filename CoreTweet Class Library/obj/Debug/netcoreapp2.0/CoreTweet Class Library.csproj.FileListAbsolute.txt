@@ -1,0 +1,10 @@
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\obj\Debug\netcoreapp2.0\CoreTweet Class Library.csproj.CoreCompileInputs.cache
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\obj\Debug\netcoreapp2.0\CoreTweet Class Library.AssemblyInfoInputs.cache
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\obj\Debug\netcoreapp2.0\CoreTweet Class Library.AssemblyInfo.cs
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\bin\Debug\netcoreapp2.0\CoreTweet Class Library.deps.json
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\bin\Debug\netcoreapp2.0\CoreTweet Class Library.runtimeconfig.json
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\bin\Debug\netcoreapp2.0\CoreTweet Class Library.runtimeconfig.dev.json
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\bin\Debug\netcoreapp2.0\CoreTweet Class Library.dll
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\bin\Debug\netcoreapp2.0\CoreTweet Class Library.pdb
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\obj\Debug\netcoreapp2.0\CoreTweet Class Library.dll
+C:\Users\jaearle\Documents\Code\PetersenExhibitionClassifier\CoreTweet Class Library\obj\Debug\netcoreapp2.0\CoreTweet Class Library.pdb
