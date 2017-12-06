@@ -1,38 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Host;
 using CoreTweet;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
-namespace PetersenExhibitionClassifier
+namespace PetersenFunctionsApp
 {
-    class Program
+    public static class MyFunction
     {
-        static void Main(string[] args)
+        [FunctionName("MyFunction")]
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
-            // Consumer Key 
             string key = "V8RTupGOUX6lnpChvBw2TKN2g";
-
-            // Consumer Secret
             string secret = "j64qb5cIMwE32jNNUsYssc2erdCOuAn70FzDysUHKxC7Qoh4of";
+            OAuth2Token token = await OAuth2.GetTokenAsync(key, secret);
 
-            OAuth2Token token = GetOAuth2Token(key, secret).Result;
             SearchResult results = Search(token, "@realDonaldtrump", 100);
 
             // Only runs once, doesn't like IEnumerator
-            foreach(var tweet in results)
+            foreach (Status tweet in results)
             {
+                // Check if tweet contains media
                 List<string> urls = new List<string>();
                 if (tweet.Entities.Media != null)
                 {
                     foreach (var entity in tweet.Entities.Media)
                     {
                         urls.Add(entity.MediaUrlHttps);
-                        Console.WriteLine(entity.MediaUrlHttps);
                     }
                 }
-
-                Console.WriteLine(urls.ToArray().ToString());
 
                 var tweetData = new
                 {
@@ -44,13 +44,10 @@ namespace PetersenExhibitionClassifier
                     Location = tweet.User.Location,
                     Media = urls.Count == 0 ? null : urls.ToArray()
                 };
-            }
-        }
 
-        static async Task<OAuth2Token> GetOAuth2Token(string key, string secret)
-        {
-            var token = await OAuth2.GetTokenAsync(key, secret);
-            return token;
+                return req.CreateResponse(HttpStatusCode.OK, tweetData);
+            }
+            return req.CreateResponse(HttpStatusCode.NoContent);
         }
 
         static SearchResult Search(OAuth2Token tokens, string query, int count)
