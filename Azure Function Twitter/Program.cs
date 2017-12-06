@@ -17,7 +17,7 @@ namespace PetersenExhibitionClassifier
             string secret = "j64qb5cIMwE32jNNUsYssc2erdCOuAn70FzDysUHKxC7Qoh4of";
 
             OAuth2Token token = GetOAuth2Token(key, secret).Result;
-            SearchResult results = Search(token, "@realDonaldtrump", 100);
+            SearchResult results = Search(token, "#PetersenMuseum", 1);
 
             // Only runs once, doesn't like IEnumerator
             foreach(var tweet in results)
