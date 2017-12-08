@@ -19,7 +19,7 @@ namespace PetersenFunctionsApp
             string secret = "j64qb5cIMwE32jNNUsYssc2erdCOuAn70FzDysUHKxC7Qoh4of";
             OAuth2Token token = await OAuth2.GetTokenAsync(key, secret);
 
-            SearchResult results = Search(token, "@realDonaldtrump", 100);
+            SearchResult results = Search(token, "@realDonaldtrump", 1);
 
             // Only runs once, doesn't like IEnumerator
             foreach (Status tweet in results)
@@ -41,8 +41,9 @@ namespace PetersenFunctionsApp
                     Text = tweet.Text,
                     RetweetsCount = tweet.RetweetCount,
                     FavoritesCount = tweet.RetweetedStatus == null ? 0 : tweet.RetweetedStatus.FavoriteCount,
-                    Location = tweet.User.Location,
-                    Media = urls.Count == 0 ? null : urls.ToArray()
+                    Location = tweet.User.Location == "" ? null : tweet.User.Location,
+                    Media = urls.Count == 0 ? null : urls.ToArray(),
+                    TweetedAt = tweet.CreatedAt
                 };
 
                 return req.CreateResponse(HttpStatusCode.OK, tweetData);
