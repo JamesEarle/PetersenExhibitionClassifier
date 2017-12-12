@@ -43,7 +43,8 @@ namespace PetersenFunctionsApp
                     FavoritesCount = tweet.RetweetedStatus == null ? 0 : tweet.RetweetedStatus.FavoriteCount,
                     Location = tweet.User.Location == "" ? null : tweet.User.Location,
                     Media = urls.Count == 0 ? null : urls.ToArray(),
-                    TweetedAt = tweet.CreatedAt
+                    TweetedAt = tweet.CreatedAt,
+                    FollowersCount = tweet.User.FollowersCount
                 };
 
                 return req.CreateResponse(HttpStatusCode.OK, tweetData);
