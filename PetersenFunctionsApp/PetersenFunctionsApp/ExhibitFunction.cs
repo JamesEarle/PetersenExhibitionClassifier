@@ -20,13 +20,14 @@ namespace PetersenFunctionsApp
         private static readonly string _startDateColumnName = "StartDate";
         private static readonly string _endDateColumnName = "EndDate";
 
-        [FunctionName("ExhbitFinder")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
+        [FunctionName("ExhibitFinder")]
+        //public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
+        public static async void Run([QueueTrigger("posts-queue", Connection = "CloudStorageAccountEndpoint"]PostEntity post, TraceWriter log)
         {
             log.Info("Exhibit Finder trigger function processed a request.");
 
             // Create Tweets object from body
-            var tweet = await req.Content.ReadAsAsync<PostEntity>();
+            //var tweet = await req.Content.ReadAsAsync<PostEntity>();
 
             // Set up table client
             var storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("CloudStorageAccountEndpoint", EnvironmentVariableTarget.Process));
@@ -43,7 +44,7 @@ namespace PetersenFunctionsApp
 
             var foundExhibit = false;
             var foundCar = false;
-            var lowerTweetText = tweet.Text.ToLower();
+            var lowerTweetText = post.Text.ToLower();
 
             var list = exhibitTable.ExecuteQuery(activeExhibitsQuery);
 
@@ -53,7 +54,7 @@ namespace PetersenFunctionsApp
                 // Look for exact exhibit name matches in the tweet
                 if (lowerTweetText.Contains(e.RowKey.ToLower()) && !foundExhibit)
                 {
-                    tweet.ExhibitsMentioned += e.RowKey;
+                    post.ExhibitsMentioned += e.RowKey;
                     foundExhibit = true;
                 }
 
@@ -62,7 +63,7 @@ namespace PetersenFunctionsApp
                 {
                     if (lowerTweetText.Contains(n.ToLower()) && !foundExhibit)
                     {
-                        tweet.ExhibitsMentioned += n;
+                        post.ExhibitsMentioned += n;
                         foundExhibit = true;
                         break;
                     }
@@ -73,13 +74,13 @@ namespace PetersenFunctionsApp
                 {
                     if (lowerTweetText.Contains(c.ToLower()) && !foundCar)
                     {
-                        tweet.CarsMentioned += c;
+                        post.CarsMentioned += c;
                         foundCar = true;
 
                         // If we got a car name, but didn't find an exhibit yet, find the matching exhibit for that car
                         if (!foundExhibit)
                         {
-                            tweet.ExhibitsMentioned = e.RowKey;
+                            post.ExhibitsMentioned = e.RowKey;
                             foundExhibit = true;
                             break;
                         }
@@ -96,9 +97,9 @@ namespace PetersenFunctionsApp
             }
 
             // If we didn't find both an exhibit and a car, check if we can get some tags from Cognitive Services
-            if(!foundExhibit && !foundCar && tweet.Media != null)
+            if(!foundExhibit && !foundCar && post.Media != null)
             {
-                foreach (var m in tweet.GetMediaLinks())
+                foreach (var m in post.GetMediaLinks())
                 {
                     var predict = new PredictionEndpoint() { ApiKey = Environment.GetEnvironmentVariable("CustomVision.APIKey", EnvironmentVariableTarget.Process) };
                     var url = new ImageUrl() { Url = m };
@@ -128,19 +129,19 @@ namespace PetersenFunctionsApp
                     }
 
                     // TODO: this assumes it always will find an exhibit from a media link, some scores might be VERY low though so hard to set a threshold
-                    tweet.ExhibitsMentioned = exhibit.Tag;
-                    tweet.CarsMentioned = car.Tag;
+                    post.ExhibitsMentioned = exhibit.Tag;
+                    post.CarsMentioned = car.Tag;
                 }
             }
 
             // Insert tweet to table storage
             var tweetTable = tableClient.GetTableReference(_postsTableName);
             exhibitTable.CreateIfNotExists();
-            TableOperation insertTweet = TableOperation.Insert(tweet);
+            TableOperation insertTweet = TableOperation.Insert(post);
             tweetTable.Execute(insertTweet);
             
             // TODO: fail case(s)?
-            return req.CreateResponse(HttpStatusCode.OK, "Success");
+            //return req.CreateResponse(HttpStatusCode.OK, "Success");
         }
     }
 }
