@@ -2,9 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Models\Tweet.cs" />
-  </ItemGroup>
   <ItemGroup>    
     <PackageReference Include="Microsoft.Cognitive.CustomVision.Prediction" Version="1.2.0" />    
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.6" />    

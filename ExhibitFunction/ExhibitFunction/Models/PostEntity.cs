@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ExhibitFunction.Models
 {
-    class TweetEntity : TableEntity
+    class PostEntity : TableEntity
     {
-        public TweetEntity(String Id)
+        public PostEntity(String Id)
         {
             this.PartitionKey = DateTime.Today.ToLongDateString();
             this.RowKey = Id;
@@ -17,17 +17,19 @@ namespace ExhibitFunction.Models
 
         public String Username { get; set; }
         public String Text { get; set; }
-        public int Favorites { get; set; }
-        public int Retweets { get; set; }
-        public String Location { get; set; }           // Twitter user's home location
-        public String MediaLinks { get; set; }
+        public int LikesCount { get; set; }
+        public int SharesCount { get; set; }
+        public String Location { get; set; }           // User's posted home location, if any is public
+        public String Media { get; set; }
         public String ExhibitsMentioned { get; set; }
         public String CarsMentioned { get; set; }
-        public DateTime TweetedAt { get; set; }
+        public DateTime PostedAt { get; set; }
+        public int FollowerCount { get; set; }
+        public String Platform { get; set; }
 
         public String[] GetMediaLinks()
         {
-            return this.MediaLinks.Split(',');
+            return this.Media.Split(',');
         }
 
         public void SetExhibitsMentioned(List<String> exhibits)

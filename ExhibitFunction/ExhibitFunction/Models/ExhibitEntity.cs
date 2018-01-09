@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace ExhibitFunction.Models
 {
-    class Exhibit : TableEntity
+    class ExhibitEntity : TableEntity
     {
-        public Exhibit()
+        public ExhibitEntity()
         {
             this.PartitionKey = "Exhibit";
         }

@@ -16,9 +16,9 @@ namespace ExhibitFunction
     public static class ExhibitFinder
     {
         private static readonly string _exhibitTableName = "Exhibits";
-        private static readonly string _tweetTableName = "Tweets";
+        private static readonly string _postsTableName = "Posts";
         private static readonly string _startDateColumnName = "StartDate";
-        private static readonly string _endDateColumnName = "Exhibits";
+        private static readonly string _endDateColumnName = "EndDate";
 
         [FunctionName("ExhbitFinder")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -26,7 +26,7 @@ namespace ExhibitFunction
             log.Info("Exhibit Finder trigger function processed a request.");
 
             // Create Tweets object from body
-            var tweet = await req.Content.ReadAsAsync<TweetEntity>();
+            var tweet = await req.Content.ReadAsAsync<PostEntity>();
 
             // Set up table client
             var storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("CloudStorageAccountEndpoint", EnvironmentVariableTarget.Process));
@@ -35,7 +35,7 @@ namespace ExhibitFunction
             // Get all active Exhibits from table storage
             var exhibitTable = tableClient.GetTableReference(_exhibitTableName);
             exhibitTable.CreateIfNotExists();
-            var activeExhibitsQuery = new TableQuery<Exhibit>().Where(
+            var activeExhibitsQuery = new TableQuery<ExhibitEntity>().Where(
                 TableQuery.CombineFilters(
                     TableQuery.GenerateFilterConditionForDate(_startDateColumnName, QueryComparisons.LessThanOrEqual, DateTime.UtcNow),
                     TableOperators.And,
@@ -45,8 +45,10 @@ namespace ExhibitFunction
             var foundCar = false;
             var lowerTweetText = tweet.Text.ToLower();
 
+            var list = exhibitTable.ExecuteQuery(activeExhibitsQuery);
+
             // Loop through each exhibit and look for exhibit and car name matches in the tweet
-            foreach (Exhibit e in exhibitTable.ExecuteQuery(activeExhibitsQuery))
+            foreach (ExhibitEntity e in exhibitTable.ExecuteQuery(activeExhibitsQuery))
             {
                 // Look for exact exhibit name matches in the tweet
                 if (lowerTweetText.Contains(e.RowKey.ToLower()) && !foundExhibit)
@@ -94,7 +96,7 @@ namespace ExhibitFunction
             }
 
             // If we didn't find both an exhibit and a car, check if we can get some tags from Cognitive Services
-            if(!foundExhibit && !foundCar && tweet.MediaLinks != null)
+            if(!foundExhibit && !foundCar && tweet.Media != null)
             {
                 foreach (var m in tweet.GetMediaLinks())
                 {
@@ -116,14 +118,12 @@ namespace ExhibitFunction
                         if ((p.Tag.Contains("Exhibit") && p.Probability > exhibit.Probability) || (p.Tag.Contains("Exhibit") && !exhibit.Tag.Contains("Exhibit")))
                         {
                             exhibit = p;
-                            log.Info($"New top Exhibit: \t{p.Tag}: {p.Probability:P1}");
                         }
 
                         // First tag could be for an exhibit not a car, so check the current prediction is for the right type
                         if ((!p.Tag.Contains("Exhibit") && p.Probability > car.Probability) || (!p.Tag.Contains("Exhibit") && car.Tag.Contains("Exhibit")))
                         {
                             car = p;
-                            log.Info($"New top Car: \t{p.Tag}: {p.Probability:P1}");
                         }
                     }
 
@@ -134,7 +134,7 @@ namespace ExhibitFunction
             }
 
             // Insert tweet to table storage
-            var tweetTable = tableClient.GetTableReference(_tweetTableName);
+            var tweetTable = tableClient.GetTableReference(_postsTableName);
             exhibitTable.CreateIfNotExists();
             TableOperation insertTweet = TableOperation.Insert(tweet);
             tweetTable.Execute(insertTweet);
