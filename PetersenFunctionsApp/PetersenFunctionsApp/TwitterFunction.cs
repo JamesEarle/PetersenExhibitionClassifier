@@ -1,22 +1,23 @@
 using System.Linq;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using CoreTweet;
 using System.Collections.Generic;
+using CoreTweet;
 
 namespace PetersenFunctionsApp
 {
-    public static class MyFunction
+    public static class TwitterFunction
     {
-        [FunctionName("MyFunction")]
+        [FunctionName("TwitterFunction")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
-            string key = "V8RTupGOUX6lnpChvBw2TKN2g";
-            string secret = "j64qb5cIMwE32jNNUsYssc2erdCOuAn70FzDysUHKxC7Qoh4of";
+            string key = Environment.GetEnvironmentVariable("TwitterAPIKey", EnvironmentVariableTarget.Process);
+            string secret = Environment.GetEnvironmentVariable("TwitterAPISecret", EnvironmentVariableTarget.Process);
             OAuth2Token token = await OAuth2.GetTokenAsync(key, secret);
 
             SearchResult results = Search(token, "@realDonaldtrump", 1);

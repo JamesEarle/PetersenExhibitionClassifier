@@ -4,7 +4,9 @@
   </PropertyGroup>
   <ItemGroup>    
     <PackageReference Include="CoreTweet" Version="0.8.1.394" />    
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Cognitive.CustomVision.Prediction" Version="1.2.0" />    
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.2" />    
+    <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.10" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
