@@ -39,12 +39,13 @@ namespace PetersenFunctionsApp
                     Id = tweet.Id,
                     Username = tweet.User.ScreenName,
                     Text = tweet.Text,
-                    RetweetsCount = tweet.RetweetCount,
-                    FavoritesCount = tweet.RetweetedStatus == null ? 0 : tweet.RetweetedStatus.FavoriteCount,
+                    LikesCount = tweet.RetweetedStatus == null ? 0 : tweet.RetweetedStatus.FavoriteCount,
+                    SharesCount = tweet.RetweetCount,
                     Location = tweet.User.Location == "" ? null : tweet.User.Location,
                     Media = urls.Count == 0 ? null : urls.ToArray(),
-                    TweetedAt = tweet.CreatedAt,
-                    FollowersCount = tweet.User.FollowersCount
+                    PostedAt = tweet.CreatedAt,
+                    FollowerCount = tweet.User.FollowersCount,
+                    Platform = "Twitter"
                 };
 
                 return req.CreateResponse(HttpStatusCode.OK, tweetData);
