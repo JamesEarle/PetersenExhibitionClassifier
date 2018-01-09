@@ -20,7 +20,7 @@ namespace PetersenFunctionsApp
         private static readonly string _startDateColumnName = "StartDate";
         private static readonly string _endDateColumnName = "EndDate";
 
-        [FunctionName("ExhbitFinder")]
+        [FunctionName("ExhibitFinder")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("Exhibit Finder trigger function processed a request.");
