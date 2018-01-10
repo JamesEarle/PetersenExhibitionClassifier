@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PetersenFunctionsApp.Models
 {
-    class PostEntity : TableEntity
+    public class PostEntity : TableEntity
     {
         public PostEntity(String Id)
         {

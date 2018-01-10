@@ -8,13 +8,18 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using System.Collections.Generic;
 using CoreTweet;
+using PetersenFunctionsApp.Models;
+using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
 
 namespace PetersenFunctionsApp
 {
     public static class TwitterFunction
     {
         [FunctionName("TwitterFunction")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, TraceWriter log)
+        [return: Queue("posts-queue", Connection = "CloudStorageAccountEndpoint")]
+        // public static async Task<HttpResponseMessage> Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static async Task<PostEntity> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
             string key = Environment.GetEnvironmentVariable("TwitterAPIKey", EnvironmentVariableTarget.Process);
             string secret = Environment.GetEnvironmentVariable("TwitterAPISecret", EnvironmentVariableTarget.Process);
@@ -35,23 +40,52 @@ namespace PetersenFunctionsApp
                     }
                 }
 
-                var tweetData = new
+                //var test = String.Join(",", urls);
+
+                //var tweetData = new {
+                //    tweet.Id,
+                //    Username = tweet.User.ScreenName,
+                //    Text = tweet.Text,
+                //    LikesCount = tweet.RetweetedStatus == null ? 0 : (int)tweet.RetweetedStatus.FavoriteCount,
+                //    SharesCount = (int)tweet.RetweetCount,
+                //    Location = tweet.User.Location == "" ? null : tweet.User.Location,
+                //    Media = urls.Count == 0 ? null : String.Join(",", urls),
+                //    PostedAt = tweet.CreatedAt.UtcDateTime,
+                //    FollowerCount = tweet.User.FollowersCount,
+                //    Platform = "Twitter"
+                //};
+
+                PostEntity tweetData = new PostEntity(tweet.Id.ToString())
                 {
-                    Id = tweet.Id,
                     Username = tweet.User.ScreenName,
                     Text = tweet.Text,
-                    LikesCount = tweet.RetweetedStatus == null ? 0 : tweet.RetweetedStatus.FavoriteCount,
-                    SharesCount = tweet.RetweetCount,
+                    LikesCount = tweet.RetweetedStatus == null ? 0 : (int)tweet.RetweetedStatus.FavoriteCount,
+                    SharesCount = (int)tweet.RetweetCount,
                     Location = tweet.User.Location == "" ? null : tweet.User.Location,
-                    Media = urls.Count == 0 ? null : urls.ToArray(),
-                    PostedAt = tweet.CreatedAt,
+                    Media = urls.Count == 0 ? null : String.Join(",", urls),
+                    PostedAt = tweet.CreatedAt.UtcDateTime,
                     FollowerCount = tweet.User.FollowersCount,
                     Platform = "Twitter"
                 };
 
-                return req.CreateResponse(HttpStatusCode.OK, tweetData);
+                //var client = new HttpClient();
+
+                //var url = "https://socialdashboardfunc.azurewebsites.net/api/ExhbitFinder?code=Nhblavq8zADr7NFcf/aHJZpVnPDai3CGaNdyBtAwoIHHPlCrPT0XlQ==";
+
+                //using (var content = new ObjectContent<PostEntity>(tweetData, new JsonMediaTypeFormatter()))
+                //{
+                //    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                //    var response = await client.PostAsync(url, content);
+                //    var responseContent = response.Content.ReadAsStringAsync().Result;
+
+                //    return req.CreateResponse(HttpStatusCode.OK, responseContent);
+                //}
+                return tweetData;
+                //return req.CreateResponse(HttpStatusCode.OK, tweetData.ToString());
             }
-            return req.CreateResponse(HttpStatusCode.NoContent);
+            return null;
+            //return req.CreateResponse(HttpStatusCode.NoContent);
         }
 
         static SearchResult Search(OAuth2Token tokens, string query, int count)

@@ -11,6 +11,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Cognitive.CustomVision.Prediction;
 using Microsoft.Cognitive.CustomVision.Prediction.Models;
 
+// TODO: fail case(s)?
 namespace PetersenFunctionsApp
 {
     public static class ExhibitFinder
@@ -21,13 +22,9 @@ namespace PetersenFunctionsApp
         private static readonly string _endDateColumnName = "EndDate";
 
         [FunctionName("ExhibitFinder")]
-        //public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
-        public static async void Run([QueueTrigger("posts-queue", Connection = "CloudStorageAccountEndpoint"]PostEntity post, TraceWriter log)
+        public static async void Run([QueueTrigger("posts-queue", Connection = "CloudStorageAccountEndpoint")]PostEntity post, TraceWriter log)
         {
             log.Info("Exhibit Finder trigger function processed a request.");
-
-            // Create Tweets object from body
-            //var tweet = await req.Content.ReadAsAsync<PostEntity>();
 
             // Set up table client
             var storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("CloudStorageAccountEndpoint", EnvironmentVariableTarget.Process));
@@ -139,9 +136,6 @@ namespace PetersenFunctionsApp
             exhibitTable.CreateIfNotExists();
             TableOperation insertTweet = TableOperation.Insert(post);
             tweetTable.Execute(insertTweet);
-            
-            // TODO: fail case(s)?
-            //return req.CreateResponse(HttpStatusCode.OK, "Success");
         }
     }
 }
