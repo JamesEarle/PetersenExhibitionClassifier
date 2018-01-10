@@ -18,8 +18,7 @@ namespace PetersenFunctionsApp
     {
         [FunctionName("TwitterFunction")]
         [return: Queue("posts-queue", Connection = "CloudStorageAccountEndpoint")]
-        // public static async Task<HttpResponseMessage> Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
-        public static async Task<PostEntity> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, TraceWriter log)
+        public static async Task<PostEntity> Run([TimerTrigger("0/30 * * * * *")]TimerInfo myTimer, TraceWriter log)
         {
             string key = Environment.GetEnvironmentVariable("TwitterAPIKey", EnvironmentVariableTarget.Process);
             string secret = Environment.GetEnvironmentVariable("TwitterAPISecret", EnvironmentVariableTarget.Process);
