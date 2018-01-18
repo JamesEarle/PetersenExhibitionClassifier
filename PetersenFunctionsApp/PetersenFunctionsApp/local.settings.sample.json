@@ -1,0 +1,13 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "AzureWebJobsDashboard": "",
+    "TwitterAPIKey": "",
+    "TwitterAPISecret": "",
+    "CloudStorageAccountEndpoint": "",
+    "CustomVision.APIKey": "",
+    "CustomVision.ProjectId": "",
+    "CustomVision.ProjectName": ""
+  }
+}
