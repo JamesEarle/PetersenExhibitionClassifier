@@ -14,14 +14,15 @@ using Microsoft.Cognitive.CustomVision.Prediction.Models;
 // TODO: fail case(s)?
 namespace PetersenFunctionsApp
 {
-    public static class ExhibitFinder
+    public static class ExhibitFunction
     {
         private static readonly string _exhibitTableName = "Exhibits";
         private static readonly string _postsTableName = "Posts";
         private static readonly string _startDateColumnName = "StartDate";
         private static readonly string _endDateColumnName = "EndDate";
+        private static readonly double _probabilityThreshold = 0.1;
 
-        [FunctionName("ExhibitFinder")]
+        [FunctionName("ExhibitFunction")]
         public static async void Run([QueueTrigger("posts-queue", Connection = "CloudStorageAccountEndpoint")]PostEntity post, TraceWriter log)
         {
             log.Info("Exhibit Finder trigger function processed a request.");
@@ -41,7 +42,7 @@ namespace PetersenFunctionsApp
 
             var foundExhibit = false;
             var foundCar = false;
-            var lowerTweetText = post.Text.ToLower();
+            var lowerPostText = post.Text.ToLower();
 
             var list = exhibitTable.ExecuteQuery(activeExhibitsQuery);
 
@@ -49,7 +50,7 @@ namespace PetersenFunctionsApp
             foreach (ExhibitEntity e in exhibitTable.ExecuteQuery(activeExhibitsQuery))
             {
                 // Look for exact exhibit name matches in the tweet
-                if (lowerTweetText.Contains(e.RowKey.ToLower()) && !foundExhibit)
+                if (lowerPostText.Contains(e.RowKey.ToLower()) && !foundExhibit)
                 {
                     post.ExhibitsMentioned += e.RowKey;
                     foundExhibit = true;
@@ -58,7 +59,7 @@ namespace PetersenFunctionsApp
                 // Look for alternate exhibit name matches in the tweet
                 foreach (String n in e.GetAltExhibitNames())
                 {
-                    if (lowerTweetText.Contains(n.ToLower()) && !foundExhibit)
+                    if (lowerPostText.Contains(n.ToLower()) && !foundExhibit)
                     {
                         post.ExhibitsMentioned += n;
                         foundExhibit = true;
@@ -69,7 +70,7 @@ namespace PetersenFunctionsApp
                 // Look for car name matches in the tweet
                 foreach (String c in e.GetCars())
                 {
-                    if (lowerTweetText.Contains(c.ToLower()) && !foundCar)
+                    if (lowerPostText.Contains(c.ToLower()) && !foundCar)
                     {
                         post.CarsMentioned += c;
                         foundCar = true;
@@ -94,8 +95,10 @@ namespace PetersenFunctionsApp
             }
 
             // If we didn't find both an exhibit and a car, check if we can get some tags from Cognitive Services
-            if(!foundExhibit && !foundCar && post.Media != null)
+            if((!foundExhibit || !foundCar) && post.Media != null)
             {
+                ImageTagPredictionModel exhibit = null;
+                 ImageTagPredictionModel car = null;
                 foreach (var m in post.GetMediaLinks())
                 {
                     var predict = new PredictionEndpoint() { ApiKey = Environment.GetEnvironmentVariable("CustomVision.APIKey", EnvironmentVariableTarget.Process) };
@@ -107,35 +110,41 @@ namespace PetersenFunctionsApp
                         null,
                         Environment.GetEnvironmentVariable("CustomVision.ProjectName", EnvironmentVariableTarget.Process));
 
-                    // TODO: Decide if we will store top tag only or go by a threshold
-                    var exhibit = result.Body.Predictions[0];
-                    var car = result.Body.Predictions[0];
                     foreach (var p in result.Body.Predictions)
                     {
-                        // First tag could be for a car not an exhibit, so check the current prediction is for the right type
-                        if ((p.Tag.Contains("Exhibit") && p.Probability > exhibit.Probability) || (p.Tag.Contains("Exhibit") && !exhibit.Tag.Contains("Exhibit")))
+                        if (p.Tag.Contains("Exhibit") &&
+                            p.Probability > _probabilityThreshold &&
+                            (exhibit == null || p.Probability > exhibit.Probability))
                         {
                             exhibit = p;
                         }
 
-                        // First tag could be for an exhibit not a car, so check the current prediction is for the right type
-                        if ((!p.Tag.Contains("Exhibit") && p.Probability > car.Probability) || (!p.Tag.Contains("Exhibit") && car.Tag.Contains("Exhibit")))
+                        if (!p.Tag.Contains("Exhibit") && 
+                            p.Probability > _probabilityThreshold &&
+                            (car == null || p.Probability > car.Probability))
                         {
                             car = p;
                         }
                     }
 
-                    // TODO: this assumes it always will find an exhibit from a media link, some scores might be VERY low though so hard to set a threshold
-                    post.ExhibitsMentioned = exhibit.Tag;
-                    post.CarsMentioned = car.Tag;
+                    // If we found an exhibit from a tag and we didn't previously find an exhibit, then add the new exhibit
+                    if (exhibit != null && !foundExhibit)
+                    {
+                        post.ExhibitsMentioned = exhibit.Tag;
+                    }
+                    // If we found an car from a tag and we didn't previously find a car, then add the new car
+                    if (car != null && !foundCar)
+                    {
+                        post.CarsMentioned = car.Tag;
+                    }
                 }
             }
 
-            // Insert tweet to table storage
-            var tweetTable = tableClient.GetTableReference(_postsTableName);
-            exhibitTable.CreateIfNotExists();
-            TableOperation insertTweet = TableOperation.Insert(post);
-            tweetTable.Execute(insertTweet);
+            // Insert post to table storage
+            var postsTable = tableClient.GetTableReference(_postsTableName);
+            postsTable.CreateIfNotExists();
+            TableOperation insertPost = TableOperation.Insert(post);
+            postsTable.Execute(insertPost);
         }
     }
 }
