@@ -1,13 +1,9 @@
 using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using PetersenFunctionsApp.Models;
 using Microsoft.Azure.WebJobs;
+using PetersenFunctionsApp.Models;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Cognitive.CustomVision.Prediction;
 using Microsoft.Cognitive.CustomVision.Prediction.Models;
 
@@ -40,39 +36,39 @@ namespace PetersenFunctionsApp
                     TableOperators.And,
                     TableQuery.GenerateFilterConditionForDate(_endDateColumnName, QueryComparisons.GreaterThanOrEqual, DateTime.UtcNow)));
 
-            var foundExhibit = false;
             var foundCar = false;
+            var foundExhibit = false;
             var lowerPostText = post.Text.ToLower();
 
             var list = exhibitTable.ExecuteQuery(activeExhibitsQuery);
 
-            // Loop through each exhibit and look for exhibit and car name matches in the tweet
+            // Loop through each exhibit and look for exhibit and car name matches in the post
             foreach (ExhibitEntity e in exhibitTable.ExecuteQuery(activeExhibitsQuery))
             {
-                // Look for exact exhibit name matches in the tweet
+                // Look for exact exhibit name matches in the post
                 if (lowerPostText.Contains(e.RowKey.ToLower()) && !foundExhibit)
                 {
-                    post.ExhibitsMentioned += e.RowKey;
+                    post.ExhibitsMentioned = e.RowKey;
                     foundExhibit = true;
                 }
 
-                // Look for alternate exhibit name matches in the tweet
+                // Look for alternate exhibit name matches in the post
                 foreach (String n in e.GetAltExhibitNames())
                 {
                     if (lowerPostText.Contains(n.ToLower()) && !foundExhibit)
                     {
-                        post.ExhibitsMentioned += n;
+                        post.ExhibitsMentioned = e.RowKey;
                         foundExhibit = true;
                         break;
                     }
                 }
 
-                // Look for car name matches in the tweet
+                // Look for car name matches in the post
                 foreach (String c in e.GetCars())
                 {
                     if (lowerPostText.Contains(c.ToLower()) && !foundCar)
                     {
-                        post.CarsMentioned += c;
+                        post.CarsMentioned = c;
                         foundCar = true;
 
                         // If we got a car name, but didn't find an exhibit yet, find the matching exhibit for that car
@@ -98,7 +94,7 @@ namespace PetersenFunctionsApp
             if((!foundExhibit || !foundCar) && post.Media != null)
             {
                 ImageTagPredictionModel exhibit = null;
-                 ImageTagPredictionModel car = null;
+                ImageTagPredictionModel car = null;
                 foreach (var m in post.GetMediaLinks())
                 {
                     var predict = new PredictionEndpoint() { ApiKey = Environment.GetEnvironmentVariable("CustomVision.APIKey", EnvironmentVariableTarget.Process) };
